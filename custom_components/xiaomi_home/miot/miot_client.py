@@ -353,6 +353,16 @@ class MIoTClient:
                 key=f'{self._uid}-{self._cloud_server}', vote=False)
 
         _LOGGER.info('init_async, %s, %s', self._uid, self._cloud_server)
+        asyncio.create_task(self.__refresh_cloud_devices_timer())
+
+    async def __refresh_cloud_devices_timer(self) -> None:
+        while True:
+            _LOGGER.info('>>>>>>refresh_cloud_devices_timer<<<<<<, %s, %s', self._uid, self._cloud_server)
+            try:
+                await self.__refresh_cloud_devices_async()
+            except Exception as ex:
+                _LOGGER.error('refresh_cloud_devices_timer, %s, %s, %s', self._uid, self._cloud_server, ex)
+            await asyncio.sleep(10)
 
     async def deinit_async(self) -> None:
         self._network.unsub_network_status(
